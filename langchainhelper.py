@@ -22,10 +22,21 @@ embeddings = HuggingFaceEmbeddings()
 vectordb_file_path = "faiss_index"
 
 def create_vectordb():
+    file_path = "data/codebasics_faqs.csv"
+    
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"CSV file not found at: {file_path}")
+
     loader = CSVLoader(
-        file_path=r"data/codebasics_faqs.csv",
-        source_column="prompt"  
+        file_path=file_path,
+        source_column="prompt",
+        encoding="utf-8-sig",  
+        csv_args={
+            'delimiter': ',',
+            'quotechar': '"',
+        }
     )
+    
     data = loader.load()
     vectordb = FAISS.from_documents(documents=data, embedding=embeddings)
     vectordb.save_local(vectordb_file_path)
