@@ -31,6 +31,10 @@ def create_vectordb():
     vectordb.save_local(vectordb_file_path)
 
 def get_qa_chain():
+    if not os.path.exists(vectordb_file_path):
+        print("Index not found. Creating vector database...")
+        create_vectordb()
+    
     vectordb = FAISS.load_local(
         vectordb_file_path, 
         embeddings, 
