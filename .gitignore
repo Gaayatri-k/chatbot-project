@@ -1,13 +1,17 @@
-# Python environment
+# Virtual Environments
 .venv/
+rag_env/
+
+# Python cache
 __pycache__/
 *.pyc
 
 # Secrets
 .env
 
-# Large Vector DB files (users should generate their own)
+# Large Vector DB files
 faiss_index/
+vector store/
 
 # OS files
 .DS_Store
