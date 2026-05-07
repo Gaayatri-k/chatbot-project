@@ -1,28 +1,38 @@
 import streamlit as st
-from langchainhelper import create_vectordb, get_qa_chain
+from langchainhelper import get_qa_chain
+st.title("Chatbot")
 
-st.title("Codebasics FAQ Bot")
-
-# 1. Add the Knowledgebase creation logic
-btn = st.button("Create Knowledgebase")
-if btn:
-    create_vectordb()
-    st.success("Knowledgebase created successfully!")
-
-# 2. Use st.cache_resource to prevent reloading the LLM on every question
-# This stops the 429 RESOURCE_EXHAUSTED error
 @st.cache_resource
 def load_chain():
     return get_qa_chain()
 
-question = st.text_input("Question:")
+chain = load_chain()
 
-if question:
-    # 3. Call the cached version
-    chain = load_chain()
-    
-    # 4. Use .invoke() for 2026 compatibility
-    response = chain.invoke({"query": question})
-    
-    st.header("Answer:")
-    st.write(response["result"]) 
+question = st.text_input("Ask anything:")
+
+ask_button = st.button("Ask")
+
+if ask_button and question:
+
+    try:
+        with st.spinner("Thinking..."):
+
+            response = chain.invoke({
+                "question": question
+            })
+
+        st.subheader("Answer")
+        st.write(response)
+
+    except Exception as e:
+
+        error_message = str(e)
+
+        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
+
+            st.error(
+                "API quota exceeded. Try again later or use another API key."
+            )
+
+        else:
+            st.error(f"Error: {error_message}")
